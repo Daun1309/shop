@@ -1,40 +1,63 @@
 import { useState } from "react";
 import data from "./data";
+import Detail from "./pages/Detail";
 import './App.css';
 import { Container,Navbar,Nav,Row,Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import bg from './img/bg.jpg';
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
 
 function App() {
 
  const [shoes] = useState(data);
+ const navigate = useNavigate();
 
   return (
     <div className="App">
+
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand href="#home">Shop</Navbar.Brand>
+          <Navbar.Brand href="/">Shop</Navbar.Brand>
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#features">Cart</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/') }}>홈</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/detail') }}>상세페이지</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
 
-      {/* 문자중간 변수 넣기 '+ +' */}
-      <div className='main-bg' style={{ backgroundImage : 'url('+ bg +')'}}></div>
+      <Routes>
+        <Route path="/" element={
+        <>
+          {/* 문자중간 변수 넣기 '+ +' */}
+          <div className='main-bg' style={{ backgroundImage : 'url('+ bg +')'}}></div>
+          <Container>
+            <Row>
+              {
+                shoes.map((a, i) => {
+                  return (
+                    <Card shoes={shoes[i]}/>
+                  )
+                })
+              }
+            </Row>
+          </Container>
+        </>
+      }/>
+        <Route path="/detail" element={<Detail/>} />
+        <Route path="*" element={<div>404</div>} />
 
-      <Container>
-        <Row>
-          {
-            shoes.map((a, i) => {
-              return (
-                <Card shoes={shoes[i]}/>
-              )
-            })
-          }
-        </Row>
-      </Container>
+        {/* nested routes - 여러 유사한 페이지 필요할 때 (부분만 조금 바뀌는,모달)*/}
+        <Route path="about" element={<About/>}>
+          <Route path="member" element={<div>멤머</div>} />
+          <Route path="location" element={<div>위치</div>} />
+        </Route>
+
+        <Route path="event" element={<Event/>}>
+          <Route path="one" element={<p>첫 주문시 양배추즙 서비스</p>} />
+          <Route path="two" element={<p>생일기념 쿠폰받기</p>} />
+        </Route>
+      </Routes>
+      
     </div>
   );
 }
@@ -49,6 +72,24 @@ function Card(props) {
       <p>{props.shoes.price}</p>
       <p>{props.shoes.content}</p>
     </Col>
+  )
+}
+
+function About() {
+  return (
+    <div>
+      <h4>회사소개</h4>
+      <Outlet></Outlet>
+    </div>  
+  )
+}
+
+function Event() {
+  return (
+    <>
+      <h3>오늘의 이벤트</h3>
+      <Outlet></Outlet>
+    </>
   )
 }
 
